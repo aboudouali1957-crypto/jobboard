@@ -36,7 +36,7 @@ docker compose up --build
 | Service | URL |
 |---|---|
 | Application | http://localhost:4200 |
-| Swagger UI | http://localhost:8080/swagger-ui.html |
+| Swagger UI | http://localhost:8081/swagger-ui.html |
 | Emails envoyés (Mailpit) | http://localhost:8025 |
 
 Au premier démarrage, un jeu de démonstration est créé : 3 entreprises, 15 offres, 4 candidats avec un CV, 14 candidatures réparties sur 6 mois.

@@ -1,5 +1,6 @@
 target/
-storage/
+# Dossier des CV deposes (./storage/cv), pas le package Java com.jobboard.storage
+/storage/
 *.log
 .idea/
 *.iml
