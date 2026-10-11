@@ -1,0 +1,125 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Candidatures reçues</h1>
+      <p>Faites avancer chaque candidature : reçue → entretien → acceptée ou refusée.</p>
+    </div>
+  </header>
+
+  <div class="toolbar-filters">
+    <mat-form-field class="offer-select" subscriptSizing="dynamic">
+      <mat-label>Offre</mat-label>
+      <mat-select [value]="offerId() ?? 'all'" (selectionChange)="filterByOffer($event.value)">
+        <mat-option value="all">Toutes mes offres</mat-option>
+        @for (offer of offers(); track offer.id) {
+          <mat-option [value]="offer.id">{{ offer.title }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-chip-listbox aria-label="Filtrer par statut" [hideSingleSelectionIndicator]="true">
+      <mat-chip-option [selected]="status() === null" (click)="filterByStatus(null)">Toutes</mat-chip-option>
+      @for (s of statuses; track s) {
+        <mat-chip-option [selected]="status() === s" (click)="filterByStatus(s)">{{ statusLabels[s] }}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement" />
+  }
+
+  @if (page(); as page) {
+    @if (page.content.length === 0) {
+      <div class="empty-state panel">
+        <mat-icon>inbox</mat-icon>
+        <p>Aucune candidature ne correspond à ces filtres.</p>
+      </div>
+    } @else {
+      <mat-accordion class="applications" multi>
+        @for (application of page.content; track application.id) {
+          <mat-expansion-panel class="application-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="header-title">
+                <strong>{{ application.candidate.firstName }} {{ application.candidate.lastName }}</strong>
+                <span class="muted small">{{ application.offerTitle }}</span>
+              </mat-panel-title>
+              <mat-panel-description class="header-meta">
+                <span class="muted small">{{ application.createdAt | timeAgo }}</span>
+                <app-status-chip [status]="application.status" />
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="candidate-grid">
+              <section>
+                <h3>Profil</h3>
+                <dl>
+                  @if (application.candidate.headline) {
+                    <dt>Titre</dt>
+                    <dd>{{ application.candidate.headline }}</dd>
+                  }
+                  <dt>Email</dt>
+                  <dd><a [href]="'mailto:' + application.candidate.email">{{ application.candidate.email }}</a></dd>
+                  @if (application.candidate.phone) {
+                    <dt>Téléphone</dt>
+                    <dd>{{ application.candidate.phone }}</dd>
+                  }
+                  @if (application.candidate.city) {
+                    <dt>Ville</dt>
+                    <dd>{{ application.candidate.city }}</dd>
+                  }
+                  <dt>Reçue le</dt>
+                  <dd>{{ application.createdAt | date: 'dd/MM/yyyy à HH:mm' }}</dd>
+                </dl>
+                @if (application.candidate.skills.length) {
+                  <div class="chip-row skills">
+                    @for (skill of application.candidate.skills; track skill) {
+                      <span class="skill-tag">{{ skill }}</span>
+                    }
+                  </div>
+                }
+              </section>
+
+              <section>
+                <h3>Message du candidat</h3>
+                <p class="letter">{{ application.coverLetter || 'Aucun message.' }}</p>
+                @if (application.recruiterMessage) {
+                  <h3>Votre dernier message</h3>
+                  <p class="letter">{{ application.recruiterMessage }}</p>
+                }
+              </section>
+            </div>
+
+            <div class="panel-actions">
+              <a matButton [routerLink]="['/recruiter/offers', application.offerId, 'edit']">Voir l'offre</a>
+              @if (application.candidate.hasCv) {
+                <button matButton="outlined" (click)="downloadCv(application)">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  CV
+                </button>
+              }
+              @for (target of nextStatuses[application.status]; track target) {
+                <button
+                  matButton="filled"
+                  [class.danger-button]="target === 'REJECTED'"
+                  (click)="changeStatus(application, target)"
+                >
+                  {{ transitionLabels[target] }}
+                </button>
+              }
+            </div>
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
+
+      <mat-paginator
+        [length]="page.totalElements"
+        [pageIndex]="page.page"
+        [pageSize]="page.size"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="changePage($event)"
+        aria-label="Pagination des candidatures"
+      />
+    }
+  }
+</div>

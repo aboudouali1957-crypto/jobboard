@@ -1,0 +1,108 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Tableau de bord</h1>
+      <p>Activité globale de la plateforme.</p>
+    </div>
+    <a matButton="outlined" routerLink="/admin/users"><mat-icon>manage_accounts</mat-icon> Gérer les utilisateurs</a>
+  </header>
+
+  @if (error()) {
+    <div class="empty-state panel">
+      <mat-icon>cloud_off</mat-icon>
+      <p>Les statistiques n'ont pas pu être chargées.</p>
+    </div>
+  } @else if (stats(); as stats) {
+    <section class="kpis" aria-label="Indicateurs clés">
+      <article class="panel kpi">
+        <span class="kpi-label"><mat-icon>group</mat-icon>Utilisateurs</span>
+        <strong>{{ stats.totalUsers | number }}</strong>
+        <span class="muted">{{ stats.usersByRole.CANDIDATE }} candidats · {{ stats.usersByRole.RECRUITER }} recruteurs</span>
+      </article>
+      <article class="panel kpi">
+        <span class="kpi-label"><mat-icon>apartment</mat-icon>Entreprises</span>
+        <strong>{{ stats.totalCompanies | number }}</strong>
+        <span class="muted">inscrites</span>
+      </article>
+      <article class="panel kpi">
+        <span class="kpi-label"><mat-icon>work</mat-icon>Offres en ligne</span>
+        <strong>{{ stats.openOffers | number }}</strong>
+        <span class="muted">{{ stats.closedOffers }} fermée{{ stats.closedOffers > 1 ? 's' : '' }}</span>
+      </article>
+      <article class="panel kpi">
+        <span class="kpi-label"><mat-icon>assignment</mat-icon>Candidatures</span>
+        <strong>{{ stats.totalApplications | number }}</strong>
+        <span class="muted">
+          @if (acceptanceRate() !== null) {
+            {{ acceptanceRate()! * 100 | number: '1.0-0' }} % d'acceptation
+          } @else {
+            aucune décision encore
+          }
+        </span>
+      </article>
+    </section>
+
+    <section class="charts">
+      <figure class="panel chart wide">
+        <figcaption>
+          <h2>Candidatures par mois</h2>
+          <span class="muted">6 derniers mois</span>
+        </figcaption>
+        <div class="canvas-box">
+          <canvas baseChart type="line" [data]="monthlyChart()" [options]="lineOptions" aria-label="Évolution mensuelle du nombre de candidatures" role="img"></canvas>
+        </div>
+      </figure>
+
+      <figure class="panel chart">
+        <figcaption>
+          <h2>Candidatures par statut</h2>
+        </figcaption>
+        <div class="canvas-box small">
+          <canvas baseChart type="bar" [data]="statusChart()" [options]="horizontalBarOptions" aria-label="Répartition des candidatures par statut" role="img"></canvas>
+        </div>
+        <ul class="legend-table" aria-label="Valeurs par statut">
+          @for (s of statuses; track s) {
+            <li>
+              <span class="swatch" [style.background]="statusColors[s]" aria-hidden="true"></span>
+              {{ statusLabels[s] }}
+              <strong>{{ stats.applicationsByStatus[s] }}</strong>
+            </li>
+          }
+        </ul>
+      </figure>
+
+      <figure class="panel chart">
+        <figcaption>
+          <h2>Offres par type de contrat</h2>
+        </figcaption>
+        <div class="canvas-box small">
+          <canvas baseChart type="bar" [data]="contractChart()" [options]="horizontalBarOptions" aria-label="Nombre d'offres par type de contrat" role="img"></canvas>
+        </div>
+      </figure>
+
+      <figure class="panel chart">
+        <figcaption>
+          <h2>Villes les plus actives</h2>
+          <span class="muted">Nombre d'offres</span>
+        </figcaption>
+        @if (stats.topCities.length) {
+          <ol class="city-list">
+            @for (city of stats.topCities; track city.city) {
+              <li>
+                <span class="city-name">{{ city.city }}</span>
+                <span class="city-bar" aria-hidden="true">
+                  <span [style.width.%]="(city.count / maxCity()) * 100"></span>
+                </span>
+                <strong>{{ city.count }}</strong>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="muted">Aucune offre publiée.</p>
+        }
+      </figure>
+    </section>
+  } @else {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement des statistiques" />
+  }
+</div>

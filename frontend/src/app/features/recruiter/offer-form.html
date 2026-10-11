@@ -1,0 +1,105 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>{{ isEdit() ? 'Modifier l’offre' : 'Publier une offre' }}</h1>
+      <p>Une offre précise (missions, compétences, salaire) attire des candidatures plus pertinentes.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement de l'offre" />
+  } @else {
+    <form class="panel" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-grid">
+        <mat-form-field class="full">
+          <mat-label>Intitulé du poste</mat-label>
+          <input matInput formControlName="title" placeholder="Développeur Full Stack Java / Angular" />
+          @if (form.controls.title.hasError('required')) {
+            <mat-error>L'intitulé est obligatoire</mat-error>
+          } @else if (form.controls.title.hasError('maxlength')) {
+            <mat-error>150 caractères maximum</mat-error>
+          } @else if (form.controls.title.hasError('server')) {
+            <mat-error>{{ form.controls.title.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Ville</mat-label>
+          <input matInput formControlName="city" />
+          @if (form.controls.city.hasError('required')) {
+            <mat-error>La ville est obligatoire</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Type de contrat</mat-label>
+          <mat-select formControlName="contractType">
+            @for (type of contractTypes; track type) {
+              <mat-option [value]="type">{{ contractLabels[type] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Salaire minimum</mat-label>
+          <input matInput type="number" min="0" step="1000" formControlName="salaryMin" />
+          <span matTextSuffix>€ brut/an</span>
+          @if (form.controls.salaryMin.hasError('min')) {
+            <mat-error>Le salaire doit être positif</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Salaire maximum</mat-label>
+          <input matInput type="number" min="0" step="1000" formControlName="salaryMax" />
+          <span matTextSuffix>€ brut/an</span>
+          @if (form.controls.salaryMax.hasError('min')) {
+            <mat-error>Le salaire doit être positif</mat-error>
+          } @else if (form.controls.salaryMax.hasError('server')) {
+            <mat-error>{{ form.controls.salaryMax.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+        @if (form.hasError('salaryRange')) {
+          <p class="form-error full" role="alert">Le salaire maximum doit être supérieur ou égal au minimum.</p>
+        }
+
+        <mat-form-field class="full">
+          <mat-label>Compétences recherchées</mat-label>
+          <mat-select formControlName="skillIds" multiple>
+            @for (skill of skills(); track skill.id) {
+              <mat-option [value]="skill.id">{{ skill.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>{{ form.controls.skillIds.value.length }} / 15</mat-hint>
+          @if (form.controls.skillIds.hasError('maxlength')) {
+            <mat-error>15 compétences maximum</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="full">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="12" maxlength="10000"></textarea>
+          <mat-hint align="end">{{ form.controls.description.value.length }} / 10 000</mat-hint>
+          @if (form.controls.description.hasError('required')) {
+            <mat-error>La description est obligatoire</mat-error>
+          } @else if (form.controls.description.hasError('minlength')) {
+            <mat-error>30 caractères minimum</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="remote" class="full">Télétravail possible</mat-slide-toggle>
+      </div>
+
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+
+      <div class="form-actions">
+        <a matButton routerLink="/recruiter/offers">Annuler</a>
+        <button matButton="filled" type="submit" [disabled]="saving()">
+          {{ isEdit() ? 'Enregistrer les modifications' : 'Publier l’offre' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

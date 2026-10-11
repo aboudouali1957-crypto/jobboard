@@ -1,0 +1,43 @@
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.role {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.role-candidate {
+  background: var(--status-received-bg);
+  color: var(--status-received-fg);
+}
+
+.role-recruiter {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.role-admin {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.disabled-row td {
+  opacity: 0.55;
+}
+
+.no-data {
+  padding: 24px;
+  text-align: center;
+  color: var(--jb-muted);
+}

@@ -1,0 +1,64 @@
+<a class="skip-link" href="#main">Aller au contenu</a>
+
+<mat-toolbar class="toolbar">
+  <a class="brand" routerLink="/" aria-label="JobBoard, accueil">
+    <span class="brand-mark" aria-hidden="true">J</span>
+    <span class="brand-name">JobBoard</span>
+  </a>
+
+  <nav class="nav-desktop" aria-label="Navigation principale">
+    @for (link of links(); track link.path) {
+      <a
+        matButton
+        [routerLink]="link.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
+      >
+        {{ link.label }}
+      </a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  @if (auth.user(); as user) {
+    <button matButton class="user-button" [matMenuTriggerFor]="userMenu" aria-label="Menu utilisateur">
+      <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+      <span class="user-name">{{ user.firstName }}</span>
+      <mat-icon iconPositionEnd>expand_more</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="menu-header">
+        <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+        <span>{{ user.email }}</span>
+        <span class="role-badge">{{ roleLabel() }}</span>
+      </div>
+      <mat-divider />
+      <div class="nav-mobile">
+        @for (link of links(); track link.path) {
+          <a mat-menu-item [routerLink]="link.path">
+            <mat-icon>{{ link.icon }}</mat-icon>
+            <span>{{ link.label }}</span>
+          </a>
+        }
+        <mat-divider />
+      </div>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Se déconnecter</span>
+      </button>
+    </mat-menu>
+  } @else {
+    <a matButton routerLink="/login">Connexion</a>
+    <a matButton="filled" routerLink="/register" class="register-button">Inscription</a>
+  }
+</mat-toolbar>
+
+<main id="main">
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <span>© {{ year }} JobBoard · Projet de démonstration Spring Boot &amp; Angular</span>
+  <a href="/swagger-ui.html" target="_blank" rel="noopener">Documentation de l'API</a>
+</footer>

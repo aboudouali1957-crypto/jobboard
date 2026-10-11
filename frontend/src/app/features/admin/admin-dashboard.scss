@@ -1,0 +1,143 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.kpi {
+  display: grid;
+  gap: 4px;
+  padding: 20px;
+
+  strong {
+    font: 800 2rem/1.1 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .muted {
+    font-size: 0.8rem;
+  }
+}
+
+.kpi-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--jb-muted);
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+
+  figcaption {
+    display: grid;
+    gap: 2px;
+
+    h2 {
+      font-size: 1rem;
+    }
+
+    span {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.canvas-box {
+  position: relative;
+  height: 260px;
+
+  &.small {
+    height: 200px;
+  }
+}
+
+.legend-table {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  font-size: 0.8rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  strong {
+    margin-left: auto;
+  }
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.city-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+
+  li {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+}
+
+.city-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.city-bar {
+  height: 10px;
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-high);
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background: #6250d6;
+  }
+}

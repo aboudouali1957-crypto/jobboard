@@ -1,0 +1,228 @@
+@use '@angular/material' as mat;
+
+// ---------------------------------------------------------------------------
+// Thème Material 3
+// ---------------------------------------------------------------------------
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        tertiary: mat.$cyan-palette,
+      ),
+      typography: (
+        plain-family: 'Inter, system-ui, sans-serif',
+        brand-family: "'Plus Jakarta Sans', Inter, sans-serif",
+      ),
+      density: 0,
+    )
+  );
+}
+
+:root {
+  --jb-radius: 16px;
+  --jb-page-width: 1120px;
+  --jb-muted: color-mix(in srgb, var(--mat-sys-on-surface) 62%, transparent);
+  --jb-border: var(--mat-sys-outline-variant);
+
+  // Couleurs des statuts de candidature (contraste AA sur fond clair)
+  --status-received-bg: #e8eaf6;
+  --status-received-fg: #303f9f;
+  --status-interview-bg: #fff3e0;
+  --status-interview-fg: #a04600;
+  --status-accepted-bg: #e5f5e9;
+  --status-accepted-fg: #1b6b34;
+  --status-rejected-bg: #fdecea;
+  --status-rejected-fg: #b3261e;
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  min-height: 100%;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--mat-sys-headline-small-font);
+  // Le body impose une hauteur de ligne fixe (20px) : on la rend proportionnelle pour les titres
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+// ---------------------------------------------------------------------------
+// Mise en page commune
+// ---------------------------------------------------------------------------
+.page {
+  max-width: var(--jb-page-width);
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--jb-muted);
+  }
+}
+
+.panel {
+  background: var(--mat-sys-surface);
+  border: 1px solid var(--jb-border);
+  border-radius: var(--jb-radius);
+  padding: 24px;
+}
+
+.muted {
+  color: var(--jb-muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  align-items: start;
+
+  .full {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--jb-muted);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--jb-border);
+  border-radius: var(--jb-radius);
+  background: var(--mat-sys-surface);
+
+  table {
+    width: 100%;
+  }
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+// ---------------------------------------------------------------------------
+// Statuts de candidature
+// ---------------------------------------------------------------------------
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 6px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@each $status in received, interview, accepted, rejected {
+  .status-#{$status} {
+    background: var(--status-#{$status}-bg);
+    color: var(--status-#{$status}-fg);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Divers
+// ---------------------------------------------------------------------------
+.danger-button {
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--mat-sys-error),
+      filled-label-text-color: var(--mat-sys-on-error),
+    )
+  );
+}
+
+.snack-error {
+  @include mat.snack-bar-overrides(
+    (
+      container-color: var(--mat-sys-error-container),
+      supporting-text-color: var(--mat-sys-on-error-container),
+      button-color: var(--mat-sys-on-error-container),
+    )
+  );
+}
+
+.snack-success {
+  @include mat.snack-bar-overrides(
+    (
+      button-color: var(--mat-sys-inverse-primary),
+    )
+  );
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.form-error {
+  color: var(--mat-sys-error);
+  margin: 0 0 12px;
+}

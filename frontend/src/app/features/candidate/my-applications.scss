@@ -1,0 +1,129 @@
+.filters {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.application-list {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.application {
+  display: grid;
+  gap: 14px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--mat-sys-on-surface);
+  text-decoration: none;
+}
+
+a.title:hover {
+  text-decoration: underline;
+}
+
+.closed {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--mat-sys-surface-container-high);
+}
+
+.timeline {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+
+  li {
+    flex: 1;
+    position: relative;
+    padding-top: 22px;
+    font-size: 0.8rem;
+    color: var(--jb-muted);
+    text-align: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--mat-sys-surface-container-highest);
+      z-index: 1;
+    }
+
+    &:not(:first-child)::after {
+      content: '';
+      position: absolute;
+      top: 9px;
+      right: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--mat-sys-surface-container-highest);
+    }
+
+    &.done {
+      color: var(--mat-sys-on-surface);
+      font-weight: 600;
+
+      &::before,
+      &::after {
+        background: var(--mat-sys-primary);
+      }
+    }
+
+    &.accepted::before {
+      background: var(--status-accepted-fg);
+    }
+
+    &.rejected::before {
+      background: var(--status-rejected-fg);
+    }
+  }
+}
+
+.message {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+  white-space: pre-line;
+
+  mat-icon {
+    flex: none;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}

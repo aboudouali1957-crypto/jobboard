@@ -1,0 +1,145 @@
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Trouvez votre prochain poste</h1>
+    <p>Des offres publiées directement par les recruteurs, avec un suivi clair de chaque candidature.</p>
+
+    <form class="filters panel" [formGroup]="form" (ngSubmit)="search()" aria-label="Rechercher des offres">
+      <mat-form-field class="keyword">
+        <mat-label>Mot-clé</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput formControlName="keyword" placeholder="Java, Angular, DevOps…" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Ville</mat-label>
+        <mat-select formControlName="city">
+          <mat-option value="">Toutes les villes</mat-option>
+          @for (city of cities(); track city) {
+            <mat-option [value]="city">{{ city }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Contrat</mat-label>
+        <mat-select formControlName="contractType">
+          <mat-option value="">Tous les contrats</mat-option>
+          @for (type of contractTypes; track type) {
+            <mat-option [value]="type">{{ contractLabels[type] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Salaire minimum</mat-label>
+        <input matInput type="number" min="0" step="1000" formControlName="minSalary" />
+        <span matTextSuffix>€/an</span>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Compétence</mat-label>
+        <mat-select formControlName="skillId">
+          <mat-option [value]="null">Toutes</mat-option>
+          @for (skill of skills(); track skill.id) {
+            <mat-option [value]="skill.id">{{ skill.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-checkbox formControlName="remote">Télétravail possible</mat-checkbox>
+
+      <div class="filter-actions">
+        <button matButton type="button" (click)="reset()">Réinitialiser</button>
+        <button matButton="filled" type="submit">
+          <mat-icon>search</mat-icon>
+          Rechercher
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="page results" aria-live="polite">
+  <div class="results-header">
+    <h2>
+      @if (result(); as page) {
+        {{ page.totalElements }} offre{{ page.totalElements > 1 ? 's' : '' }}
+      } @else {
+        Offres
+      }
+    </h2>
+    <mat-form-field class="sort" subscriptSizing="dynamic">
+      <mat-label>Trier par</mat-label>
+      <mat-select [formControl]="form.controls.sort" (selectionChange)="search()">
+        @for (sort of sorts; track sort.value) {
+          <mat-option [value]="sort.value">{{ sort.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement des offres" />
+  }
+
+  @if (loadError()) {
+    <div class="empty-state">
+      <mat-icon>cloud_off</mat-icon>
+      <p>Impossible de charger les offres pour le moment.</p>
+    </div>
+  } @else if (result(); as page) {
+    @if (page.content.length === 0) {
+      <div class="empty-state">
+        <mat-icon>travel_explore</mat-icon>
+        <p>Aucune offre ne correspond à ces critères.</p>
+        <button matButton="outlined" (click)="reset()">Effacer les filtres</button>
+      </div>
+    } @else {
+      <ul class="offer-list">
+        @for (offer of page.content; track offer.id) {
+          <li>
+            <a class="offer-card" [routerLink]="['/offers', offer.id]">
+              <div class="offer-top">
+                <span class="company-logo" aria-hidden="true">{{ offer.companyName.charAt(0) }}</span>
+                <div class="offer-heading">
+                  <h3>{{ offer.title }}</h3>
+                  <span class="muted">{{ offer.companyName }}</span>
+                </div>
+                <span class="date muted">{{ offer.createdAt | timeAgo }}</span>
+              </div>
+
+              <div class="offer-meta">
+                <span><mat-icon>location_on</mat-icon>{{ offer.city }}</span>
+                <span><mat-icon>description</mat-icon>{{ offer.contractType | contractLabel }}</span>
+                <span><mat-icon>payments</mat-icon>{{ offer | salary }}</span>
+                @if (offer.remote) {
+                  <span><mat-icon>home_work</mat-icon>Télétravail</span>
+                }
+              </div>
+
+              @if (offer.skills.length) {
+                <div class="chip-row">
+                  @for (skill of offer.skills.slice(0, 5); track skill) {
+                    <span class="skill-tag">{{ skill }}</span>
+                  }
+                  @if (offer.skills.length > 5) {
+                    <span class="skill-tag more">+{{ offer.skills.length - 5 }}</span>
+                  }
+                </div>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+
+      <mat-paginator
+        [length]="page.totalElements"
+        [pageIndex]="page.page"
+        [pageSize]="page.size"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="changePage($event)"
+        aria-label="Pagination des offres"
+      />
+    }
+  }
+</section>

@@ -1,0 +1,107 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Mon profil</h1>
+      <p>Ces informations et votre CV sont transmis aux recruteurs lorsque vous postulez.</p>
+    </div>
+  </header>
+
+  @if (profile(); as profile) {
+    <div class="layout">
+      <form class="panel" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <h2>Informations personnelles</h2>
+        <div class="form-grid">
+          <mat-form-field>
+            <mat-label>Prénom</mat-label>
+            <input matInput formControlName="firstName" autocomplete="given-name" />
+            @if (form.controls.firstName.hasError('required')) {
+              <mat-error>Le prénom est obligatoire</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Nom</mat-label>
+            <input matInput formControlName="lastName" autocomplete="family-name" />
+            @if (form.controls.lastName.hasError('required')) {
+              <mat-error>Le nom est obligatoire</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput [value]="profile.email" disabled />
+            <mat-hint>L'email sert d'identifiant et ne peut pas être modifié</mat-hint>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Téléphone</mat-label>
+            <input matInput type="tel" formControlName="phone" autocomplete="tel" />
+            @if (form.controls.phone.hasError('pattern')) {
+              <mat-error>Numéro de téléphone invalide</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Ville</mat-label>
+            <input matInput formControlName="city" autocomplete="address-level2" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Titre du profil</mat-label>
+            <input matInput formControlName="headline" placeholder="Développeur full stack Java / Angular" />
+            <mat-hint align="end">{{ form.controls.headline.value.length }} / 150</mat-hint>
+          </mat-form-field>
+          <mat-form-field class="full">
+            <mat-label>Compétences</mat-label>
+            <mat-select formControlName="skillIds" multiple>
+              @for (skill of skills(); track skill.id) {
+                <mat-option [value]="skill.id">{{ skill.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>{{ form.controls.skillIds.value.length }} sélectionnée(s), 20 maximum</mat-hint>
+            @if (form.controls.skillIds.hasError('maxlength')) {
+              <mat-error>20 compétences maximum</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="full">
+            <mat-label>Présentation</mat-label>
+            <textarea matInput formControlName="bio" rows="5" maxlength="3000"></textarea>
+            <mat-hint align="end">{{ form.controls.bio.value.length }} / 3000</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="form-actions">
+          <button matButton="filled" type="submit" [disabled]="saving() || form.pristine">Enregistrer</button>
+        </div>
+      </form>
+
+      <section class="panel cv" aria-labelledby="cv-title">
+        <h2 id="cv-title">Mon CV</h2>
+        @if (profile.cv; as cv) {
+          <div class="cv-file">
+            <mat-icon>picture_as_pdf</mat-icon>
+            <div>
+              <strong>{{ cv.fileName }}</strong>
+              <span class="muted">Déposé le {{ cv.uploadedAt | date: 'dd/MM/yyyy à HH:mm' }}</span>
+            </div>
+          </div>
+          <button matButton="outlined" type="button" (click)="downloadCv()">
+            <mat-icon>download</mat-icon>
+            Télécharger
+          </button>
+        } @else {
+          <p class="muted">Aucun CV déposé. Il est obligatoire pour postuler.</p>
+        }
+
+        <input #fileInput type="file" accept="application/pdf,.pdf" hidden (change)="onFileSelected($event)" />
+        <button matButton="filled" type="button" (click)="fileInput.click()" [disabled]="uploading()">
+          <mat-icon>upload_file</mat-icon>
+          {{ profile.cv ? 'Remplacer le CV' : 'Déposer mon CV' }}
+        </button>
+        <span class="muted small">Format PDF, 5 Mo maximum.</span>
+        @if (uploading()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Envoi du CV" />
+        }
+        @if (cvError()) {
+          <p class="error" role="alert">{{ cvError() }}</p>
+        }
+      </section>
+    </div>
+  } @else {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement du profil" />
+  }
+</div>

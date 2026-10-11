@@ -1,0 +1,107 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Mes candidatures</h1>
+      <p>Suivez l'avancement de chaque candidature. Vous recevez un email à chaque changement de statut.</p>
+    </div>
+    <a matButton="filled" routerLink="/"><mat-icon>search</mat-icon> Chercher des offres</a>
+  </header>
+
+  <mat-chip-listbox aria-label="Filtrer par statut" class="filters" [hideSingleSelectionIndicator]="true">
+    <mat-chip-option [selected]="status() === null" (click)="filterBy(null)">Toutes</mat-chip-option>
+    @for (s of statuses; track s) {
+      <mat-chip-option [selected]="status() === s" (click)="filterBy(s)">{{ statusLabels[s] }}</mat-chip-option>
+    }
+  </mat-chip-listbox>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement" />
+  }
+
+  @if (page(); as page) {
+    @if (page.content.length === 0) {
+      <div class="empty-state panel">
+        <mat-icon>assignment</mat-icon>
+        <p>
+          @if (status()) {
+            Aucune candidature avec ce statut.
+          } @else {
+            Vous n'avez pas encore postulé. Trouvez une offre qui vous correspond !
+          }
+        </p>
+      </div>
+    } @else {
+      <ul class="application-list">
+        @for (application of page.content; track application.id) {
+          <li class="panel application">
+            <div class="top">
+              <div>
+                @if (application.offerStatus === 'OPEN') {
+                  <a class="title" [routerLink]="['/offers', application.offerId]">{{ application.offerTitle }}</a>
+                } @else {
+                  <span class="title">{{ application.offerTitle }}</span>
+                  <span class="closed" matTooltip="L'offre n'est plus en ligne">Offre fermée</span>
+                }
+                <p class="muted">
+                  {{ application.companyName }} · {{ application.offerCity }} · {{ application.contractType | contractLabel }}
+                </p>
+              </div>
+              <app-status-chip [status]="application.status" />
+            </div>
+
+            <ol class="timeline" aria-label="Avancement">
+              <li [class.done]="stepReached(application, 'RECEIVED')">Reçue</li>
+              <li [class.done]="stepReached(application, 'INTERVIEW')">Entretien</li>
+              <li
+                [class.done]="stepReached(application, 'DECISION')"
+                [class.accepted]="application.status === 'ACCEPTED'"
+                [class.rejected]="application.status === 'REJECTED'"
+              >
+                @switch (application.status) {
+                  @case ('ACCEPTED') {
+                    Acceptée
+                  }
+                  @case ('REJECTED') {
+                    Refusée
+                  }
+                  @default {
+                    Décision
+                  }
+                }
+              </li>
+            </ol>
+
+            @if (application.recruiterMessage) {
+              <blockquote class="message">
+                <mat-icon>chat</mat-icon>
+                <span>{{ application.recruiterMessage }}</span>
+              </blockquote>
+            }
+
+            <div class="bottom">
+              <span class="muted">
+                Envoyée le {{ application.createdAt | date: 'dd/MM/yyyy' }} · mise à jour le
+                {{ application.updatedAt | date: 'dd/MM/yyyy' }}
+              </span>
+              @if (application.status === 'RECEIVED') {
+                <button matButton (click)="withdraw(application)">
+                  <mat-icon>undo</mat-icon>
+                  Retirer
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+
+      <mat-paginator
+        [length]="page.totalElements"
+        [pageIndex]="page.page"
+        [pageSize]="page.size"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="changePage($event)"
+        aria-label="Pagination des candidatures"
+      />
+    }
+  }
+</div>
